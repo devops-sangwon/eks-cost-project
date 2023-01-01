@@ -14,30 +14,18 @@ provider "aws" {
   profile = "EleSangwon-dev"
 }
 
-# provider "kubernetes" {
-#   host                   = module.eks.cluster_endpoint
-#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+provider "kubernetes" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
 
-#   exec {
-#     api_version = "client.authentication.k8s.io/v1alpha1"
-#     command     = "aws"
-#     # This requires the awscli to be installed locally where Terraform is executed
-#     args = ["eks", "get-token", "--cluster-name", module.eks.cluster_id]
-#   }
-# }
-# data "aws_eks_cluster" "default" {
-#   name = module.eks.cluster_id
-# }
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    # This requires the awscli to be installed locally where Terraform is executed
+    args = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+  }
+}
 
-# data "aws_eks_cluster_auth" "default" {
-#   name = module.eks.cluster_id
-# }
-
-# provider "kubernetes" {
-#   host                   = data.aws_eks_cluster.default.endpoint
-#   cluster_ca_certificate = base64decode(data.aws_eks_cluster.default.certificate_authority[0].data)
-#   token                  = data.aws_eks_cluster_auth.default.token
-# }
 data "terraform_remote_state" "vpc" {
   backend = "s3"
 
@@ -61,40 +49,6 @@ locals {
   vpc                   = data.terraform_remote_state.vpc.outputs.vpc
   private_subnets_by_az = local.vpc.private_subnets
 }
-
-# module "cluster_autoscaler_irsa_role" {
-#   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
-#   role_name                        = "cluster-autoscaler"
-#   attach_cluster_autoscaler_policy = true
-#   cluster_autoscaler_cluster_ids   = [module.eks.cluster_id]
-
-#   oidc_providers = {
-#     ex = {
-#       provider_arn               = module.eks.oidc_provider_arn
-#       namespace_service_accounts = ["kube-system:cluster-autoscaler"]
-#     }
-#   }
-
-#   tags = local.tags
-# }
-
-module "ebs_csi_irsa_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-
-  role_name             = "ebs-csi"
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
-  tags = local.tags
-}
-
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -127,19 +81,29 @@ module "eks" {
 
   eks_managed_node_groups = {
     project-dev-ondemand = {
-      min_size       = 1
-      max_size       = 2
-      desired_size   = 1
+      min_size       = 2
+      max_size       = 3
+      desired_size   = 2
       instance_types = ["t3.medium"]
       capacity_type  = "ON_DEMAND"
+      labels = {
+        Environment = "ON_DEMAND_SPOT"
+        GithubRepo  = "eks-cost-project"
+        GithubOrg   = "devops-sangwon"
+      }
     }
     project-dev-spot = {
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      min_size     = 2
+      max_size     = 3
+      desired_size = 2
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
+      labels = {
+        Environment = "ONLY_SPOT"
+        GithubRepo  = "eks-cost-project"
+        GithubOrg   = "devops-sangwon"
+      }
     }
   }
   # aws-auth configmap
