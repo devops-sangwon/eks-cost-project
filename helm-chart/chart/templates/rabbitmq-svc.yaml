@@ -1,0 +1,19 @@
+{{- define "sock-shop.rabbitmq.svc" -}}
+metadata:
+  name: rabbitmq
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '9090'
+spec:
+  ports:
+    - port: 5672
+      name: rabbitmq
+      targetPort: 5672
+    - port: 9090
+      name: exporter
+      targetPort: exporter
+      protocol: TCP
+  selector:
+    name: rabbitmq
+{{- end -}}
+{{- include "sock-shop.svc" (list . "sock-shop.rabbitmq.svc" ) }}

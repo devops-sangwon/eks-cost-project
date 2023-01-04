@@ -1,0 +1,11 @@
+{{- define "sock-shop.session-db.svc" -}}
+metadata:
+  name: session-db
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    name: session-db
+{{- end -}}
+{{- include "sock-shop.svc" (list . "sock-shop.session-db.svc" ) }}

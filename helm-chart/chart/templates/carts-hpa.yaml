@@ -1,0 +1,9 @@
+{{- define "sock-shop.carts.hpa" -}}
+metadata:
+  name: carts
+  namespace: sock-shop
+spec:
+  scaleTargetRef:
+    name: carts
+{{- end -}}
+{{- include "sock-shop.hpa" (list . "sock-shop.carts.hpa" ) }}

@@ -1,0 +1,12 @@
+{{- define "sock-shop.carts.svc" -}}
+metadata:
+  name: carts
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    name: carts
+{{- end -}}
+{{- include "sock-shop.svc" (list . "sock-shop.carts.svc" ) }}

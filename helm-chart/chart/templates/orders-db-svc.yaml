@@ -1,0 +1,11 @@
+{{- define "sock-shop.orders-db.svc" -}}
+metadata:
+  name: orders-db
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    name: orders-db
+{{- end -}}
+{{- include "sock-shop.svc" (list . "sock-shop.orders-db.svc" ) }}

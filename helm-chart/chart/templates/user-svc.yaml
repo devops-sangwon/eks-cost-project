@@ -1,0 +1,13 @@
+{{- define "sock-shop.user.svc" -}}
+metadata:
+  name: user
+  annotations:
+    prometheus.io/scrape: 'true'
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    name: user
+{{- end -}}
+{{- include "sock-shop.svc" (list . "sock-shop.user.svc" ) }}

@@ -1,0 +1,10 @@
+apiVersion: v2
+description: A Helm chart for Sock Shop
+name: sock-shop
+version: 0.1.0
+type: application
+
+dependencies:
+  - name: common-chart
+    version: "1.0.0"
+    repository: "file://../charts/common-chart"

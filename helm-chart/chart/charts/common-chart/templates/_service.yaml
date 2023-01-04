@@ -1,0 +1,21 @@
+{{- define "sock-shop.svc.tpl" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sock-shop.fullname" . }}
+  labels:
+    {{- include "sock-shop.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "sock-shop.selectorLabels" . | nindent 4 }}
+{{- end }}
+
+{{- define "sock-shop.svc" -}}
+{{- include "sock-shop.util.merge" (append . "sock-shop.svc.tpl") -}}
+{{- end -}}
