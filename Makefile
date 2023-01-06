@@ -11,29 +11,22 @@ usage:
 	@echo "helmfile.apply : Apply helmfile ENV"
 	@echo "helmfile.template : Template helmfile"
 
-
-
 tf.vpc-setup:
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
-	sleep 5s
-	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} apply
+	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} apply -auto-approve
 
 tf.eks-setup:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
-	sleep 5s
-	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} apply
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} apply -auto-approve
 
 tf.vpc-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
-	sleep 5s
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} destroy -auto-approve
 
 
 tf.eks-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
-	sleep 5s
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} destroy -auto-approve
-
 
 helmfile.apply:
 	@helmfile apply --file helmfile/helmfile.yaml -e ${ENVIRONMENT} -i
