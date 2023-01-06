@@ -1,0 +1,41 @@
+name: ON EKS All Chart
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+on:
+  # schedule:
+  # - cron: "0 0 * * *"
+
+jobs:
+  eks-on:
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: ["dev", "qa", "staging"]
+        namespace: ["sock-shop", "example", "msa"]
+    environment: ${{ matrix.environment }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-northeast-2
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: eks-cost-project
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: v1.24
+      - uses: azure/setup-helm@v3
+        with:
+          version: v3.7.1
+      - name: get k8s cluster
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER }}
+      - name: Helm Rollback history
+        run: |
+          REVISION=`helm history ${{ matrix.namespace }} -n ${{ matrix.namespace }} | xargs`
+          REVISION=$((REVISION))
+          LAST_REVISION=$(($REVISION -1))
+          helm rollback ${{ matrix.namespace }} $LAST_REVISION -n ${{ matrix.namespace }}

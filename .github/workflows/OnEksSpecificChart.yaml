@@ -1,0 +1,100 @@
+name: On EKS Specific Chart
+on:
+  repository_dispatch:
+    types: [run]
+jobs:
+  run-eks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check Github action trigger
+        run:  |
+          echo "Event '${{ github.event.action }}' received from '${{ github.event.client_payload.repository }}'"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ap-northeast-2
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: eks-cost-project
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: v1.24
+      - uses: azure/setup-helm@v3
+        with:
+          version: v3.7.1
+      - name: get k8s cluster
+        run: |
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER }}
+      - name: Helm Rollback history
+        run: |
+          REVISION=`helm history ${{ github.event.client_payload.application }} -n ${{ github.event.client_payload.namespace }} | xargs`
+          REVISION=$((REVISION))
+          LAST_REVISION=$(($REVISION -1))
+
+          helm rollback ${{ github.event.client_payload.application }} $LAST_REVISION -n ${{ github.event.client_payload.namespace }}
+
+  slack:
+    runs-on: ubuntu-22.04
+    needs: [run-eks]
+    if: always()
+    steps:
+      - name: Send to Slack (Success)
+        if: |
+          needs.run-eks.result == 'success'
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "attachments": [
+                  {
+                      "fallback": "✅ Success Helm Rollback keep history",
+                      "color": "#36AE7C",
+                      "text": "✅ Success Helm Rollback keep history",
+                      "fields": [
+                          {
+                              "title": "Application",
+                              "value": "${{ github.event.client_payload.application }}",
+                              "short": true
+                          },
+                          {
+                              "title": "Namespace",
+                              "value": "${{ github.event.client_payload.namespace }}",
+                              "short": true
+                          }
+                      ]
+                  }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      - name: Send to Slack(Failure)
+        if: |
+          needs.run-eks.result == 'failure'
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "attachments": [
+                  {
+                      "fallback": "❌ Failure Helm Rollback keep history",
+                      "color": "#EB5353",
+                      "text": "❌ Failure Helm Rollback keep history",
+                      "fields": [
+                          {
+                              "title": "Deployment",
+                              "value": "${{ github.event.client_payload.application }}",
+                              "short": true
+                          },
+                          {
+                              "title": "Namespace",
+                              "value": "${{ github.event.client_payload.namespace }}",
+                              "short": true
+                          }
+                      ]
+                  }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
