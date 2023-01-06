@@ -1,0 +1,6 @@
+rbac:
+  create: true
+commonLabels:
+  project: sock-shop
+podLabels:
+  chart: helmfile # pod level label

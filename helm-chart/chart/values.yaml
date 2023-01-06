@@ -2,6 +2,35 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+carts-db:
+  replicas: 1
+carts:
+  replicas: 1
+catalogue-db:
+  replicas: 1
+frontend:
+  replicas: 1
+load-test:
+  replicas: 1
+orders-db:
+  replicas: 1
+
+orders:
+  replicas: 1
+payment:
+  replicas: 1
+queue-master:
+  replicas: 1
+rabbimq:
+  replicas: 1
+session:
+  replicas: 1
+shipping:
+  replicas: 1
+user-db:
+  replicas: 1
+user:
+  replicas: 1
 replicaCount: 1
 
 image:
