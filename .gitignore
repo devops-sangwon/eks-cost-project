@@ -4,3 +4,8 @@
 
 *.tfstate
 *.tfstate.*
+
+# Cluster AutoScaler log
+
+test/autoscaling/*.txt
+test/autoscaling/*.log
