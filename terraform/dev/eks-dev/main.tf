@@ -55,7 +55,7 @@ module "eks" {
   version = "~> 19.0"
 
   cluster_name    = local.name
-  cluster_version = "1.24"
+  cluster_version = "1.23"
 
   cluster_endpoint_public_access = true
   cluster_enabled_log_types      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
@@ -81,9 +81,9 @@ module "eks" {
 
   eks_managed_node_groups = {
     project-dev-ondemand = {
-      min_size       = 2
-      max_size       = 3
-      desired_size   = 2
+      min_size       = 0
+      max_size       = 1
+      desired_size   = 0
       instance_types = ["t3.medium"]
       capacity_type  = "ON_DEMAND"
       labels = {

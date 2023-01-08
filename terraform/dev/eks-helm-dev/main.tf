@@ -32,6 +32,7 @@ locals {
     Team        = "devops"
     Project     = "eks-cost-project"
   }
+  profile          = "EleSangwon-dev"
   eks              = data.terraform_remote_state.eks.outputs.eks
   provider_url     = local.eks.oidc_provider
   eks_cluster_name = local.eks.cluster_name
@@ -45,4 +46,5 @@ module "base_services" {
   provider_url     = local.provider_url
   eks_cluster_name = local.eks_cluster_name
   output_eks       = local.eks
+  profile          = local.profile
 }

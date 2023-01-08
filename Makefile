@@ -28,6 +28,12 @@ tf.eks-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} destroy -auto-approve
 
+tf.all-clean:
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} destroy -auto-approve
+	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
+	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} apply -auto-approve
+
 helmfile.apply:
 	@helmfile apply --file helmfile/helmfile.yaml -e ${ENVIRONMENT} -i
 
