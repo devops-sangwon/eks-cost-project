@@ -1,0 +1,15 @@
+"autoDiscovery":
+  "clusterName": "eks-cost-project-dev"
+"awsRegion": "ap-northeast-2"
+"extraArgs":
+  "balance-similar-node-groups": "true"
+  "skip-nodes-with-local-storage": "false"
+  "skip-nodes-with-system-pods": "false"
+"image":
+  "tag": "v1.22.2"
+"rbac":
+  "create": true
+  "serviceAccount":
+    "annotations":
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::002174788893:role/cluster-autoscaler"
+    "name": "aws-cluster-autoscaler"

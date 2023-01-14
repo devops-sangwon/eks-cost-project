@@ -1,0 +1,15 @@
+"aws":
+  "region": "ap-northeast-2"
+  "zoneType": "public"
+"domainFilters":
+- "elesangwon.com"
+"provider": "aws"
+"registry": "txt"
+"serviceAccount":
+  "annotations":
+    "eks.amazonaws.com/role-arn": "arn:aws:iam::002174788893:role/external-dns-eks-cost-project-dev"
+  "name": "external-dns"
+"sources":
+- "service"
+- "ingress"
+"txtOwnerId": "eks-cost-project-dev"

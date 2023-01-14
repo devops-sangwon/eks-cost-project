@@ -1,0 +1,8 @@
+"clusterName": "eks-cost-project-dev"
+"rbac":
+  "create": true
+"region": "ap-northeast-2"
+"serviceAccount":
+  "annotations":
+    "eks.amazonaws.com/role-arn": "arn:aws:iam::002174788893:role/aws-load-balancer-controller"
+  "name": "aws-load-balancer-controller"

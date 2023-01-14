@@ -80,22 +80,35 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    project-dev-ondemand = {
-      min_size       = 0
-      max_size       = 1
-      desired_size   = 0
+    # project-dev-ondemand = {
+    #   min_size       = 0
+    #   max_size       = 1
+    #   desired_size   = 0
+    #   instance_types = ["t3.medium"]
+    #   capacity_type  = "ON_DEMAND"
+    #   labels = {
+    #     Environment = "ON_DEMAND_SPOT"
+    #     GithubRepo  = "eks-cost-project"
+    #     GithubOrg   = "devops-sangwon"
+    #   }
+    # }
+    project-dev-spot-a = {
+      min_size     = 1
+      max_size     = 10
+      desired_size = 1
+
       instance_types = ["t3.medium"]
-      capacity_type  = "ON_DEMAND"
+      capacity_type  = "SPOT"
       labels = {
-        Environment = "ON_DEMAND_SPOT"
+        Environment = "ONLY_SPOT"
         GithubRepo  = "eks-cost-project"
         GithubOrg   = "devops-sangwon"
       }
     }
-    project-dev-spot = {
-      min_size     = 2
-      max_size     = 3
-      desired_size = 2
+    project-dev-spot-b = {
+      min_size     = 1
+      max_size     = 10
+      desired_size = 1
 
       instance_types = ["t3.medium"]
       capacity_type  = "SPOT"
