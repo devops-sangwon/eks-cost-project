@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-to-scaleout
-  namespace: default
+  name: test-3
+  namespace: test-3
   labels:
     service: nginx
 spec:
-  replicas: 20
+  replicas: 10
   selector:
     matchLabels:
       service: nginx

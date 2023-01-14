@@ -31,10 +31,11 @@ tf.eks-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} destroy -auto-approve
 
 tf.all-setup:
-	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
-	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} apply -auto-approve
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} apply -auto-approve
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} apply -auto-approve
+
 
 tf.all-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init

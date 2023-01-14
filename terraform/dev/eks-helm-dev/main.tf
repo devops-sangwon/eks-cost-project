@@ -7,10 +7,15 @@ terraform {
     dynamodb_table = "terraform-lock"
   }
 }
+provider "aws" {
+  region  = "ap-northeast-2"
+  profile = "EleSangwon-dev"
+}
 
 provider "aws" {
   region  = "ap-northeast-2"
   profile = "EleSangwon-dev"
+  alias   = "EleSangwon-dev"
 }
 
 data "terraform_remote_state" "eks" {
@@ -41,10 +46,14 @@ locals {
 module "base_services" {
   source = "git@github.com:devops-sangwon/terraform-modules.git//modules/helm"
 
-  name             = local.name
-  tags             = local.tags
-  provider_url     = local.provider_url
-  eks_cluster_name = local.eks_cluster_name
-  output_eks       = local.eks
-  profile          = local.profile
+  name               = local.name
+  tags               = local.tags
+  provider_url       = local.provider_url
+  eks_cluster_name   = local.eks_cluster_name
+  output_eks         = local.eks
+  profile            = local.profile
+  external_dns_zones = ["elesangwon.com"]
+  providers = {
+    aws.dev = aws.EleSangwon-dev
+  }
 }
