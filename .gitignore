@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+terraform/eks-dev/values/**
+terraform/eks-helm-dev/values/**
+
 # Cluster AutoScaler log
 
 test/autoscaling/*.txt
