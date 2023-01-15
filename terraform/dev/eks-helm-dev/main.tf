@@ -41,18 +41,21 @@ locals {
   eks              = data.terraform_remote_state.eks.outputs.eks
   provider_url     = local.eks.oidc_provider
   eks_cluster_name = local.eks.cluster_name
+ # domain_acm       = "arn:aws:acm:ap-northeast-2:002174788893:certificate/f56f4ce7-0c36-493f-b2cf-c9cc4944faa0"
 }
 
 module "base_services" {
-  source = "git@github.com:devops-sangwon/terraform-modules.git//modules/helm"
+  source = "git@github.com:devops-sangwon/terraform-modules.git//modules/helm?ref=master"
 
-  name               = local.name
-  tags               = local.tags
-  provider_url       = local.provider_url
-  eks_cluster_name   = local.eks_cluster_name
-  output_eks         = local.eks
-  profile            = local.profile
-  external_dns_zones = ["elesangwon.com"]
+  name                        = local.name
+  tags                        = local.tags
+  provider_url                = local.provider_url
+  eks_cluster_name            = local.eks_cluster_name
+  output_eks                  = local.eks
+  profile                     = local.profile
+  external_dns_zones          = ["elesangwon.com"]
+  # kubernetes_dashboard_domain = "eks-dev-dashboard.elesangwon.com"
+  # domain_acm                  = local.domain_acm
   providers = {
     aws.dev = aws.EleSangwon-dev
   }
