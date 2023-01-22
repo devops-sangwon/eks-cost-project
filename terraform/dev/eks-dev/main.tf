@@ -141,3 +141,155 @@ module "eks" {
     "002174788893"
   ]
 }
+
+# module "iam_role_ebs_csi_driver" {
+#   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+#   version                       = "5.10.0"
+#   create_role                   = true
+#   role_name                     = "ebs_csi_driver"
+#   role_policy_arns              = [module.iam_policy_ebs_csi_driver.arn]
+#   depends_on                    = [module.iam_policy_ebs_csi_driver]
+# }
+
+# module "iam_policy_ebs_csi_driver" {
+#   source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
+#   name        = "ebs-csi-driver--${var.eks_cluster_name}"
+#   path        = "/"
+#   description = "EBS CSI Driver policy in ${var.eks_cluster_name}"
+
+#   policy = <<-EOF
+#   {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:CreateSnapshot",
+#           "ec2:AttachVolume",
+#           "ec2:DetachVolume",
+#           "ec2:ModifyVolume",
+#           "ec2:DescribeAvailabilityZones",
+#           "ec2:DescribeInstances",
+#           "ec2:DescribeSnapshots",
+#           "ec2:DescribeTags",
+#           "ec2:DescribeVolumes",
+#           "ec2:DescribeVolumesModifications"
+#         ],
+#         "Resource": "*"
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:CreateTags"
+#         ],
+#         "Resource": [
+#           "arn:aws:ec2:*:*:volume/*",
+#           "arn:aws:ec2:*:*:snapshot/*"
+#         ],
+#         "Condition": {
+#           "StringEquals": {
+#             "ec2:CreateAction": [
+#               "CreateVolume",
+#               "CreateSnapshot"
+#             ]
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteTags"
+#         ],
+#         "Resource": [
+#           "arn:aws:ec2:*:*:volume/*",
+#           "arn:aws:ec2:*:*:snapshot/*"
+#         ]
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:CreateVolume"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "aws:RequestTag/ebs.csi.aws.com/cluster": "true"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:CreateVolume"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "aws:RequestTag/CSIVolumeName": "*"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteVolume"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "ec2:ResourceTag/ebs.csi.aws.com/cluster": "true"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteVolume"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "ec2:ResourceTag/CSIVolumeName": "*"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteVolume"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "ec2:ResourceTag/kubernetes.io/created-for/pvc/name": "*"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteSnapshot"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "ec2:ResourceTag/CSIVolumeSnapshotName": "*"
+#           }
+#         }
+#       },
+#       {
+#         "Effect": "Allow",
+#         "Action": [
+#           "ec2:DeleteSnapshot"
+#         ],
+#         "Resource": "*",
+#         "Condition": {
+#           "StringLike": {
+#             "ec2:ResourceTag/ebs.csi.aws.com/cluster": "true"
+#           }
+#         }
+#       }
+#     ]
+#   }
+#   EOF
+# }
