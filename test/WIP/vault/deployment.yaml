@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-config.json: common
+        vault.hashicorp.com/agent-inject-template-config.json: |
+          {{- with secret "common" -}}
+          null
+          {{- end }}
+        vault.hashicorp.com/role: vault-sa
+        vault.hashicorp.com/secret-volume-path: /vault
+        vault.hashicorp.com/secret-volume-path-config.json: /config
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
