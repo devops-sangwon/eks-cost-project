@@ -55,6 +55,10 @@ module "base_services" {
   profile            = local.profile
   external_dns_zones = ["elesangwon.com"]
   vault_domain       = "vault-dev.elesangwon.com"
+  kubecost_domain    = "cost-analyzer-dev.elesangwon.com"
+  external_dns_kubecost_hostname = "cost-analyzer-dev.elesangwon.com"
+
+  ## WIP
   # kubernetes_dashboard_domain = "eks-dev-dashboard.elesangwon.com"
   # domain_acm                  = local.domain_acm
   providers = {

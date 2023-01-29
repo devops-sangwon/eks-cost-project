@@ -120,26 +120,26 @@ module "eks" {
     }
   }
   # aws-auth configmap
-  manage_aws_auth_configmap = false
+  # manage_aws_auth_configmap = false
 
-  aws_auth_users = [
-    {
-      groups   = ["system:masters"]
-      userarn  = "arn:aws:iam::002174788893:user/EleSangwon-dev"
-      username = "eks-cost-project-dev-devops"
-    }
-  ]
+  # aws_auth_users = [
+  #   {
+  #     groups   = ["system:masters"]
+  #     userarn  = "arn:aws:iam::002174788893:user/EleSangwon-dev"
+  #     username = "eks-cost-project-dev-devops"
+  #   }
+  # ]
 
-  aws_auth_roles = [
-    {
-      groups   = ["system:masters"]
-      rolearn  = "arn:aws:iam::002174788893:role/eks-cost-project-dev-devops"
-      username = "eks-cost-project-dev-devops"
-    }
-  ]
-  aws_auth_accounts = [
-    "002174788893"
-  ]
+  # aws_auth_roles = [
+  #   {
+  #     groups   = ["system:masters"]
+  #     rolearn  = "arn:aws:iam::002174788893:role/eks-cost-project-dev-devops"
+  #     username = "eks-cost-project-dev-devops"
+  #   }
+  # ]
+  # aws_auth_accounts = [
+  #   "002174788893"
+  # ]
 }
 
 # module "iam_role_ebs_csi_driver" {

@@ -22,6 +22,10 @@ tf.eks-setup:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} apply -auto-approve
 
+tf.helm-setup:
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-helm-${ENVIRONMENT} init
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-helm-${ENVIRONMENT} apply -auto-approve
+
 tf.vpc-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} destroy -auto-approve
@@ -30,6 +34,10 @@ tf.eks-clean:
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/eks-${ENVIRONMENT} destroy -auto-approve
 
+tf.helm-clean:
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-helm-${ENVIRONMENT} init
+	@terraform -chdir=terraform/${ENVIRONMENT}/eks-helm-${ENVIRONMENT} destroy -auto-approve
+	
 tf.all-setup:
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} init
 	@terraform -chdir=terraform/${ENVIRONMENT}/vpc-${ENVIRONMENT} apply -auto-approve
