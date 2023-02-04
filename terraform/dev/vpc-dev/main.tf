@@ -25,7 +25,10 @@ module "vpc" {
   public_subnets     = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
 
   private_subnet_tags = { "kubernetes.io/role/internal-elb" = 1 }
-  public_subnet_tags  = { "kubernetes.io/role/elb" = 1 }
+  public_subnet_tags  = { 
+    "kubernetes.io/role/elb" = 1
+    "karpenter.sh/discovery" = "true"
+  }
 
   tags = {
     "kubernetes.io/cluster/eks-cost-project-dev" = "shared"

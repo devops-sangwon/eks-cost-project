@@ -1,60 +1,8 @@
-terraform {
-  backend "s3" {
-    region         = "ap-northeast-2"
-    bucket         = "eks-cost-project-tfstates-dev"
-    key            = "eks-cost-project-tfstates-dev/eks-cost-project-eks-dev.tfstate"
-    profile        = "EleSangwon-dev"
-    dynamodb_table = "terraform-lock"
-  }
-}
-
-
-provider "aws" {
-  region  = "ap-northeast-2"
-  profile = "EleSangwon-dev"
-}
-
-provider "kubernetes" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
-  }
-}
-
-data "terraform_remote_state" "vpc" {
-  backend = "s3"
-
-  config = {
-    bucket         = "eks-cost-project-tfstates-dev"
-    region         = "ap-northeast-2"
-    key            = "eks-cost-project-tfstates-dev/eks-cost-project-vpc-dev.tfstate"
-    profile        = "EleSangwon-dev"
-    dynamodb_table = "terraform-lock"
-  }
-}
-
-locals {
-  name = "eks-cost-project-dev"
-  tags = {
-    Name        = local.name
-    Environment = "dev"
-    Project     = "eks-cost-project"
-    Team        = "devops"
-  }
-  vpc                   = data.terraform_remote_state.vpc.outputs.vpc
-  private_subnets_by_az = local.vpc.private_subnets
-}
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.0"
 
-  cluster_name    = local.name
+  cluster_name    = local.cluster_name
   cluster_version = "1.23"
 
   cluster_endpoint_public_access = true
@@ -74,222 +22,84 @@ module "eks" {
   }
   vpc_id     = local.vpc.vpc_id
   subnet_ids = tolist(local.private_subnets_by_az)
-  # EKS Managed Node Group(s)
-  eks_managed_node_group_defaults = {
-    instance_types = ["t3.medium", "t3.small"]
+  # Required for Karpenter role below
+  enable_irsa = true
+
+  # node_security_group_additional_rules = {
+  #   ingress_nodes_karpenter_port = {
+  #     description                   = "Cluster API to Node group for Karpenter webhook"
+  #     protocol                      = "tcp"
+  #     from_port                     = 8443
+  #     to_port                       = 8443
+  #     type                          = "ingress"
+  #     source_cluster_security_group = true
+  #   }
+  # }
+  node_security_group_tags = {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
+    "karpenter.sh/discovery" = local.cluster_name
   }
+  # EKS Managed Node Group(s)
 
   eks_managed_node_groups = {
-    # project-dev-ondemand = {
-    #   min_size       = 0
-    #   max_size       = 1
-    #   desired_size   = 0
-    #   instance_types = ["t3.medium"]
-    #   capacity_type  = "ON_DEMAND"
-    #   labels = {
-    #     Environment = "ON_DEMAND_SPOT"
-    #     GithubRepo  = "eks-cost-project"
-    #     GithubOrg   = "devops-sangwon"
-    #   }
-    # }
-    project-dev-spot-a = {
-      min_size     = 1
-      max_size     = 10
-      desired_size = 1
-
+    initial = {
       instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
-      labels = {
-        Environment = "ONLY_SPOT"
-        GithubRepo  = "eks-cost-project"
-        GithubOrg   = "devops-sangwon"
-      }
-    }
-    project-dev-spot-b = {
-      min_size     = 1
-      max_size     = 10
-      desired_size = 1
+      # Not required nor used - avoid tagging two security groups with same tag as well
+      create_security_group = false
 
-      instance_types = ["t3.medium"]
-      capacity_type  = "SPOT"
-      labels = {
-        Environment = "ONLY_SPOT"
-        GithubRepo  = "eks-cost-project"
-        GithubOrg   = "devops-sangwon"
-      }
+      # Ensure enough capacity to run 2 Karpenter pods
+      min_size     = 2
+      max_size     = 3
+      desired_size = 2
     }
   }
-  # aws-auth configmap
-  # manage_aws_auth_configmap = false
-
-  # aws_auth_users = [
-  #   {
-  #     groups   = ["system:masters"]
-  #     userarn  = "arn:aws:iam::002174788893:user/EleSangwon-dev"
-  #     username = "eks-cost-project-dev-devops"
-  #   }
-  # ]
-
-  # aws_auth_roles = [
-  #   {
-  #     groups   = ["system:masters"]
-  #     rolearn  = "arn:aws:iam::002174788893:role/eks-cost-project-dev-devops"
-  #     username = "eks-cost-project-dev-devops"
-  #   }
-  # ]
-  # aws_auth_accounts = [
-  #   "002174788893"
-  # ]
 }
 
-# module "iam_role_ebs_csi_driver" {
-#   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-#   version                       = "5.10.0"
-#   create_role                   = true
-#   role_name                     = "ebs_csi_driver"
-#   role_policy_arns              = [module.iam_policy_ebs_csi_driver.arn]
-#   depends_on                    = [module.iam_policy_ebs_csi_driver]
-# }
+module "karpenter" {
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "19.6.0"
 
-# module "iam_policy_ebs_csi_driver" {
-#   source      = "terraform-aws-modules/iam/aws//modules/iam-policy"
-#   name        = "ebs-csi-driver--${var.eks_cluster_name}"
-#   path        = "/"
-#   description = "EBS CSI Driver policy in ${var.eks_cluster_name}"
+  cluster_name = module.eks.cluster_name
 
-#   policy = <<-EOF
+  irsa_oidc_provider_arn          = module.eks.oidc_provider_arn
+  irsa_namespace_service_accounts = ["karpenter:karpenter"]
+
+  # Since Karpenter is running on an EKS Managed Node group,
+  # we can re-use the role that was created for the node group
+  create_iam_role = false
+  iam_role_arn    = module.eks.eks_managed_node_groups["initial"].iam_role_arn
+  tags            = local.tags
+
+  # Do not add depend on . 
+  # If add depends_on and then get error message.
+  # depends_on = [module.eks]
+}
+
+
+
+
+# aws-auth configmap
+# manage_aws_auth_configmap = false
+
+# aws_auth_users = [
 #   {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:CreateSnapshot",
-#           "ec2:AttachVolume",
-#           "ec2:DetachVolume",
-#           "ec2:ModifyVolume",
-#           "ec2:DescribeAvailabilityZones",
-#           "ec2:DescribeInstances",
-#           "ec2:DescribeSnapshots",
-#           "ec2:DescribeTags",
-#           "ec2:DescribeVolumes",
-#           "ec2:DescribeVolumesModifications"
-#         ],
-#         "Resource": "*"
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:CreateTags"
-#         ],
-#         "Resource": [
-#           "arn:aws:ec2:*:*:volume/*",
-#           "arn:aws:ec2:*:*:snapshot/*"
-#         ],
-#         "Condition": {
-#           "StringEquals": {
-#             "ec2:CreateAction": [
-#               "CreateVolume",
-#               "CreateSnapshot"
-#             ]
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteTags"
-#         ],
-#         "Resource": [
-#           "arn:aws:ec2:*:*:volume/*",
-#           "arn:aws:ec2:*:*:snapshot/*"
-#         ]
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:CreateVolume"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "aws:RequestTag/ebs.csi.aws.com/cluster": "true"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:CreateVolume"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "aws:RequestTag/CSIVolumeName": "*"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteVolume"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "ec2:ResourceTag/ebs.csi.aws.com/cluster": "true"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteVolume"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "ec2:ResourceTag/CSIVolumeName": "*"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteVolume"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "ec2:ResourceTag/kubernetes.io/created-for/pvc/name": "*"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteSnapshot"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "ec2:ResourceTag/CSIVolumeSnapshotName": "*"
-#           }
-#         }
-#       },
-#       {
-#         "Effect": "Allow",
-#         "Action": [
-#           "ec2:DeleteSnapshot"
-#         ],
-#         "Resource": "*",
-#         "Condition": {
-#           "StringLike": {
-#             "ec2:ResourceTag/ebs.csi.aws.com/cluster": "true"
-#           }
-#         }
-#       }
-#     ]
+#     groups   = ["system:masters"]
+#     userarn  = "arn:aws:iam::002174788893:user/EleSangwon-dev"
+#     username = "eks-cost-project-dev-devops"
 #   }
-#   EOF
-# }
+# ]
+
+# aws_auth_roles = [
+#   {
+#     groups   = ["system:masters"]
+#     rolearn  = "arn:aws:iam::002174788893:role/eks-cost-project-dev-devops"
+#     username = "eks-cost-project-dev-devops"
+#   }
+# ]
+# aws_auth_accounts = [
+#   "002174788893"
+# ]
+
+
