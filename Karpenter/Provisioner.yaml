@@ -42,7 +42,7 @@ spec:
       values: ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
     - key: "kubernetes.io/arch"
       operator: In
-      values: ["arm64", "amd64"]
+      values: ["amd64"]
     - key: "karpenter.sh/capacity-type" # If not included, the webhook for the AWS cloud provider will default to on-demand
       operator: In
       values: ["spot", "on-demand"]
