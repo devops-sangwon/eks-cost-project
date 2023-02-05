@@ -53,6 +53,14 @@ module "eks" {
       min_size     = 2
       max_size     = 3
       desired_size = 2
+
+      # taints = {
+      #   dedicated = {
+      #     key    = "dedicated"
+      #     value  = "KarpenterOnly"
+      #     effect = "NO_SCHEDULE"
+      #   }
+      # }
     }
   }
 }

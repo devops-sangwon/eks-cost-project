@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: test-3
-  namespace: test-3
+  namespace: test-1
   labels:
     service: nginx
 spec:
@@ -20,8 +20,8 @@ spec:
         name: nginx-to-scaleout
         resources:
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 8
+            memory: 128Mi
           requests:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 20m
+            memory: 20Mi
