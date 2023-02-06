@@ -3,6 +3,7 @@ permissions:
   id-token: write
   contents: write
   pull-requests: write
+# on: push
 on:
   push:
     branches: [temp]
@@ -19,22 +20,37 @@ jobs:
     environment: ${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
+      - name: Clone Module Repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-sangwon/gh-module
+          ref: ${{ secrets.module_version }}
+          path: ./action_modules
       - uses: actions/checkout@v3
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Get AWS Credentials 
+        uses: ./action_modules/common/aws/credential
         with:
-          aws-region: ap-northeast-2
-          role-to-assume: ${{ secrets.ASSUME_ROLE }}
-          role-session-name: eks-cost-project
-      - uses: azure/setup-kubectl@v3
+          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      - name: setup kubectl & helm
+        uses: ./action_modules/common/deploy/helm
         with:
-          version: v1.24
-      - uses: azure/setup-helm@v3
-        with:
-          version: v3.7.1
-      - name: get k8s cluster
-        run: |
-          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER }}
+          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
       - name: Helm uninstall keep history
         run: |
           helm uninstall ${{ matrix.namespace }} -n ${{ matrix.namespace }} --keep-history
+      - name: Success eks-off
+        if: success()
+        uses: ./action_modules/common/slack/success/eks-cost-project/schedule
+        with:
+          MESSAGE: 'OFF EKS CLUSTER'
+          TYPE: 'off'
+          EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
+          SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}
+      - name: Failure eks-off
+        if: failure()
+        uses: ./action_modules/common/slack/failure/eks-cost-project/schedule
+        with:
+          MESSAGE: 'OFF EKS CLUSTER'
+          TYPE: 'off'
+          EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
+          SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}

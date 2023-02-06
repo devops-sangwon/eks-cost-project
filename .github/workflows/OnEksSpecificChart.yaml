@@ -1,100 +1,66 @@
-name: On EKS Specific Chart
+name: chatbot On EKS
 on:
   repository_dispatch:
     types: [run]
 jobs:
-  run-eks:
+  chatbot-eks-on:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        environment: ["${{ github.event.client_payload.deploy_env }}"]
     steps:
+      - name: Clone Module Repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-sangwon/gh-module
+          ref: ${{ secrets.module_version }}
+          path: ./action_modules
       - uses: actions/checkout@v3
-      - name: Check Github action trigger
-        run:  |
-          echo "Event '${{ github.event.action }}' received from '${{ github.event.client_payload.repository }}'"
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Get AWS Credentials 
+        uses: ./action_modules/common/aws/credential
         with:
-          aws-region: ap-northeast-2
-          role-to-assume: ${{ secrets.ASSUME_ROLE }}
-          role-session-name: eks-cost-project
-      - uses: azure/setup-kubectl@v3
+          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      - name: setup kubectl & helm
+        uses: ./action_modules/common/deploy/helm
         with:
-          version: v1.24
-      - uses: azure/setup-helm@v3
-        with:
-          version: v3.7.1
-      - name: get k8s cluster
-        run: |
-          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER }}
+          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
       - name: Helm Rollback history
         run: |
-          REVISION=`helm history ${{ github.event.client_payload.application }} -n ${{ github.event.client_payload.namespace }} | xargs`
+          REVISION=`helm history ${{ github.event.client_payload.helm }} -n ${{ github.event.client_payload.namespace }} | xargs`
           REVISION=$((REVISION))
           LAST_REVISION=$(($REVISION -1))
-
-          helm rollback ${{ github.event.client_payload.application }} $LAST_REVISION -n ${{ github.event.client_payload.namespace }}
+          helm rollback ${{ github.event.client_payload.helm }} $LAST_REVISION -n ${{ github.event.client_payload.namespace }}
 
   slack:
     runs-on: ubuntu-22.04
-    needs: [run-eks]
+    needs: [chatbot-eks-on]
     if: always()
     steps:
+      - name: Clone Module Repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-sangwon/gh-module
+          ref: ${{ secrets.module_version }}
+          path: ./action_modules
       - name: Send to Slack (Success)
         if: |
-          needs.run-eks.result == 'success'
-        uses: slackapi/slack-github-action@v1.23.0
+          needs.chatbot-eks-on.result == 'success'
+        uses: ./action_modules/common/slack/success/eks-cost-project/chatbot
         with:
-          payload: |
-            {
-              "attachments": [
-                  {
-                      "fallback": "✅ Success Helm Rollback keep history",
-                      "color": "#36AE7C",
-                      "text": "✅ Success Helm Rollback keep history",
-                      "fields": [
-                          {
-                              "title": "Application",
-                              "value": "${{ github.event.client_payload.application }}",
-                              "short": true
-                          },
-                          {
-                              "title": "Namespace",
-                              "value": "${{ github.event.client_payload.namespace }}",
-                              "short": true
-                          }
-                      ]
-                  }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          MESSAGE: 'Success EKS CLUSTER'
+          TYPE: ${{ github.event.client_payload.type }}
+          EKS_CLUSTER: ${{ github.event.client_payload.eks_cluster }}
+          TARGET_NAMESPACE: ${{ github.event.client_payload.namespace }}
+          TARGET_HELM: ${{ github.event.client_payload.helm }}
+          SLACK_WEBHOOK: ${{ secrets.CHATOPS_SLACK_WEBHOOK }}
       - name: Send to Slack(Failure)
         if: |
-          needs.run-eks.result == 'failure'
-        uses: slackapi/slack-github-action@v1.23.0
+          needs.chatbot-eks-on.result == 'failure'
+        uses: ./action_modules/common/slack/failure/eks-cost-project/chatbot
         with:
-          payload: |
-            {
-              "attachments": [
-                  {
-                      "fallback": "❌ Failure Helm Rollback keep history",
-                      "color": "#EB5353",
-                      "text": "❌ Failure Helm Rollback keep history",
-                      "fields": [
-                          {
-                              "title": "Deployment",
-                              "value": "${{ github.event.client_payload.application }}",
-                              "short": true
-                          },
-                          {
-                              "title": "Namespace",
-                              "value": "${{ github.event.client_payload.namespace }}",
-                              "short": true
-                          }
-                      ]
-                  }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          MESSAGE: 'Failure EKS CLUSTER'
+          TYPE: ${{ github.event.client_payload.type }}
+          EKS_CLUSTER: ${{ github.event.client_payload.eks_cluster }}
+          TARGET_NAMESPACE: ${{ github.event.client_payload.namespace }}
+          TARGET_HELM: ${{ github.event.client_payload.helm }}
+          SLACK_WEBHOOK: ${{ secrets.CHATOPS_SLACK_WEBHOOK }}
