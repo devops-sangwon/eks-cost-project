@@ -1,0 +1,13 @@
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+  name: wip
+spec:
+  subnetSelector:
+    karpenter.sh/discovery: "true"
+  securityGroupSelector:
+    karpenter.sh/discovery: eks-cost-project-dev
+  tags:
+    karpenter.sh/discovery: eks-cost-project-dev
+    owner: EleSangwon
+    team: devops

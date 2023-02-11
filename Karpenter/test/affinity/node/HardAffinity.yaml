@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeaffinity
+  namespace: default
+  labels:
+    service: nginx
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      service: nginx
+  template:
+    metadata:
+      labels:
+        service: nginx
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: karpenter.sh/capacity-type
+                operator: In
+                values:
+                - on-demand
+      containers:
+      - image: nginx
+        name: nodeaffinity
+        resources:
+          limits:
+            cpu: 4
+            memory: 2000Mi
+          requests:
+            cpu: 250m
+            memory: 100Mi

@@ -44,7 +44,7 @@ module "eks" {
   # EKS Managed Node Group(s)
 
   eks_managed_node_groups = {
-    initial = {
+    karpenter_node = {
       instance_types = ["t3.medium"]
       # Not required nor used - avoid tagging two security groups with same tag as well
       create_security_group = false
@@ -77,7 +77,7 @@ module "karpenter" {
   # Since Karpenter is running on an EKS Managed Node group,
   # we can re-use the role that was created for the node group
   create_iam_role = false
-  iam_role_arn    = module.eks.eks_managed_node_groups["initial"].iam_role_arn
+  iam_role_arn    = module.eks.eks_managed_node_groups["karpenter_node"].iam_role_arn
   tags            = local.tags
 
   # Do not add depend on . 

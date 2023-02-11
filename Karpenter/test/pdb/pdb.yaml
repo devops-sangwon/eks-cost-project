@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: spot-test
+  namespace: default
+spec:
+  maxUnavailable: 4
+  selector:
+    matchLabels:
+      service: nginx

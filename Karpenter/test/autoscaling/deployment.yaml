@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: default
+  labels:
+    service: nginx
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      service: nginx
+  template:
+    metadata:
+      labels:
+        service: nginx
+    spec:
+      terminationGracePeriodSeconds: 150
+      containers:
+      - image: nginx
+        name: karpenter-test
+        resources:
+          limits:
+            cpu: 40
+            memory: 20000Mi
+          requests:
+            cpu: 250m
+            memory: 100Mi

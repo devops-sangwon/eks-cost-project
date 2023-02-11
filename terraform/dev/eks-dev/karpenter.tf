@@ -5,7 +5,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "v0.23.0"
+  version    = "v0.24.0"
 
   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   repository_password = data.aws_ecrpublic_authorization_token.token.password
@@ -42,17 +42,33 @@ resource "kubectl_manifest" "karpenter_provisioner" {
     apiVersion: karpenter.sh/v1alpha5
     kind: Provisioner
     metadata:
-      name: default
+      name: wip
     spec:
       requirements:
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ["spot"]
+          values: ["spot", "on-demand"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["t", "c", "m", "r"]
+        - key: "karpenter.k8s.aws/instance-cpu"
+          operator: In
+          values: ["2", "4", "8", "16", "32"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
       limits:
         resources:
-          cpu: 1000
+          cpu: 1k
+          memory: 1000Gi
       providerRef:
-        name: default
+        name: wip
       ttlSecondsAfterEmpty: 30
   YAML
 
@@ -66,7 +82,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
     apiVersion: karpenter.k8s.aws/v1alpha1
     kind: AWSNodeTemplate
     metadata:
-      name: default
+      name: wip
     spec:
       subnetSelector:
         karpenter.sh/discovery: "true"
@@ -74,6 +90,8 @@ resource "kubectl_manifest" "karpenter_node_template" {
         karpenter.sh/discovery: ${module.eks.cluster_name}
       tags:
         karpenter.sh/discovery: ${module.eks.cluster_name}
+        owner: EleSangwon
+        team: devops
   YAML
 
   depends_on = [
