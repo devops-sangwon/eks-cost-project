@@ -12,3 +12,7 @@ terraform/dev/eks-helm-dev/values/**
 
 test/autoscaling/*.txt
 test/autoscaling/*.log
+
+# Private files
+ignores/
+ignores/**

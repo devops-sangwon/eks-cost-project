@@ -6,8 +6,11 @@ usage:
 	@echo "Example Command : make tf.vpc-setup ENVIRONMENT=dev"
 	@echo "tf.vpc-setup : Setup Terraform vpc setup"
 	@echo "tf.eks-setup : Setup Terraform eks setup"
+	@echo "tf.helm-setup : Setup Terraform helm setup"
+	
 	@echo "tf.vpc-clean : Delete Terraform vpc"
 	@echo "tf.eks-clean : Delete Terraform eks"
+	@echo "tf.helm-clean : Delete Terraform helm"
 	@echo "tf.all-setup : Setup Terraform VPC -> EKS -> HELM "
 	@echo "tf.all-clean : Delete Terraform HELM -> EKS -> VPC"
 
