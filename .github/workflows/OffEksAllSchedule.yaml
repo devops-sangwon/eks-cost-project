@@ -1,4 +1,4 @@
-name: OFF EKS All Chart
+name: OFF EKS All Chart 1
 permissions:
   id-token: write
   contents: write
