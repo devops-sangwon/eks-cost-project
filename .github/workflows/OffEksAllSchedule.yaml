@@ -20,13 +20,16 @@ jobs:
     # environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v3
+      - name: checkout  
+        run: |
+          ls -al
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
           repository: devops-sangwon/gh-module
           ref: v1.0.0 #${{ secrets.MODULE_VERSION }}
           path: ./action_modules
-      - uses: actions/checkout@v3
       - name: checkout  
         run: |
           ls -al
