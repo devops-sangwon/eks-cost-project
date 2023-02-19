@@ -1,31 +1,35 @@
-name: ON EKS All Chart
+name: ON EKS
 permissions:
   id-token: write
   contents: write
   pull-requests: write
+# on: push
 on:
   push:
-    branches: [temp]
+    branches: [temp-on]
+# on:
+#   push:
+#     branches: [temp]
   # schedule:
   # - cron: "0 0 * * *"
 
 jobs:
-  eks-on:
+  ON-EKS:
     strategy:
       max-parallel: 1
       matrix:
-        environment: ["dev", "qa", "staging"]
+        environment: ["dev"]
         namespace: ["sock-shop", "example", "msa"]
     environment: ${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v3
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
           repository: devops-sangwon/gh-module
           ref: ${{ secrets.module_version }}
           path: ./action_modules
-      - uses: actions/checkout@v3
       - name: Get AWS Credentials 
         uses: ./action_modules/common/aws/credential
         with:
@@ -36,7 +40,7 @@ jobs:
           EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
       - name: Helm Rollback history
         run: |
-          REVISION=`helm history ${{ matrix.namespace }} -n ${{ matrix.namespace }} | xargs`
+          REVISION=`helm history ${{ matrix.namespace }} -n ${{ matrix.namespace }} | wc -l | xargs`
           REVISION=$((REVISION))
           LAST_REVISION=$(($REVISION -1))
           helm rollback ${{ matrix.namespace }} $LAST_REVISION -n ${{ matrix.namespace }}

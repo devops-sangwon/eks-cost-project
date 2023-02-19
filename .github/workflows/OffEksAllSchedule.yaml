@@ -1,4 +1,4 @@
-name: OFF EKS All Chart
+name: OFF EKS
 permissions:
   id-token: write
   contents: write
@@ -6,27 +6,27 @@ permissions:
 # on: push
 on:
   push:
-    branches: [temp]
+    branches: [temp-off]
   # schedule:
   # - cron: "0 0 * * *"
 
 jobs:
-  eks-off:
+  OFF-EKS:
     strategy:
       max-parallel: 1
       matrix:
-        environment: ["dev", "qa", "staging"]
+        environment: ["dev"]
         namespace: ["sock-shop", "example", "msa"]
     environment: ${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v3
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
           repository: devops-sangwon/gh-module
           ref: ${{ secrets.module_version }}
           path: ./action_modules
-      - uses: actions/checkout@v3
       - name: Get AWS Credentials 
         uses: ./action_modules/common/aws/credential
         with:
