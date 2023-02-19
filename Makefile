@@ -62,3 +62,9 @@ helmfile.apply:
 
 helmfile.template:
 	@helmfile template --file helmfile/helmfile.yaml -e ${ENVIRONMENT} -init
+
+helm.deploy:
+	@helm upgrade --install sock-shop helm-chart/sock-shop --set ingress.host="sock-shop-dev.elesangwon.com",ingress.name="sock-shop-ingress" -n sock-shop
+	@helm upgrade --install msa helm-chart/sock-shop --set ingress.host="msa-dev.elesangwon.com",ingress.name="msa-ingress" -n msa
+	@helm upgrade --install example helm-chart/sock-shop --set ingress.host="example-dev.elesangwon.com",ingress.name="example-ingress" -n example
+	

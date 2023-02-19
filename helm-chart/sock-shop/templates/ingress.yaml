@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sock-shop-ingress
+  name: {{ .Values.ingress.name }}
   namespace: sock-shop
   annotations:
     kubernetes.io/ingress.class: alb
