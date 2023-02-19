@@ -11,70 +11,46 @@ on:
   # - cron: "0 0 * * *"
 
 jobs:
-  test:
-    # strategy:
-    #   # max-parallel: 1
-    #   matrix:
-    #     # environment: ["dev"]
-    #     namespace: ["sock-shop"] #["sock-shop", "example", "msa"]
-    # environment: dev #${{ matrix.environment }}
+  eks-off:
+    strategy:
+      # max-parallel: 1
+      matrix:
+        # environment: ["dev"]
+        namespace: ["sock-shop", "example", "msa"]
+    environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: checkout  
-        run: |
-          ls -al
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
           repository: devops-sangwon/gh-module
-          ref: v1.0.0 #${{ secrets.MODULE_VERSION }}
+          ref: ${{ secrets.MODULE_VERSION }}
           path: ./action_modules
-      - name: checkout  
+      - name: Get AWS Credentials 
+        uses: ./action_modules/common/aws/credential
+        with:
+          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      - name: setup kubectl & helm
+        uses: ./action_modules/common/deploy/helm
+        with:
+          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
+      - name: Helm uninstall keep history
         run: |
-          ls -al
-
-
-  # eks-off:
-  #   strategy:
-  #     # max-parallel: 1
-  #     matrix:
-  #       # environment: ["dev"]
-  #       namespace: ["sock-shop"] #["sock-shop", "example", "msa"]
-  #   environment: dev #${{ matrix.environment }}
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Clone Module Repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: devops-sangwon/gh-module
-  #         ref: ${{ secrets.MODULE_VERSION }}
-  #         path: ./action_modules
-  #     - uses: actions/checkout@v3
-  #     - name: Get AWS Credentials 
-  #       uses: ./action_modules/common/aws/credential
-  #       with:
-  #         AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
-  #     - name: setup kubectl & helm
-  #       uses: ./action_modules/common/deploy/helm
-  #       with:
-  #         EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
-  #     - name: Helm uninstall keep history
-  #       run: |
-  #         helm uninstall ${{ matrix.namespace }} -n ${{ matrix.namespace }} --keep-history
-  #     - name: Success eks-off
-  #       if: success()
-  #       uses: ./action_modules/common/slack/success/eks-cost-project/schedule
-  #       with:
-  #         MESSAGE: 'OFF EKS CLUSTER'
-  #         TYPE: 'off'
-  #         EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
-  #         SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}
-  #     - name: Failure eks-off
-  #       if: failure()
-  #       uses: ./action_modules/common/slack/failure/eks-cost-project/schedule
-  #       with:
-  #         MESSAGE: 'OFF EKS CLUSTER'
-  #         TYPE: 'off'
-  #         EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
-  #         SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}
+          helm uninstall ${{ matrix.namespace }} -n ${{ matrix.namespace }} --keep-history
+      - name: Success eks-off
+        if: success()
+        uses: ./action_modules/common/slack/success/eks-cost-project/schedule
+        with:
+          MESSAGE: 'OFF EKS CLUSTER'
+          TYPE: 'off'
+          EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
+          SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}
+      - name: Failure eks-off
+        if: failure()
+        uses: ./action_modules/common/slack/failure/eks-cost-project/schedule
+        with:
+          MESSAGE: 'OFF EKS CLUSTER'
+          TYPE: 'off'
+          EKS_CLUSTER: '${{ secrets.EKS_CLUSTER }}'
+          SLACK_WEBHOOK: ${{ secrets.SCHEDULE_SLACK_WEBHOOK }}
