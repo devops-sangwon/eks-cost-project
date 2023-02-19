@@ -1,21 +1,26 @@
-name: chatbot On EKS
+name: chatbot On/Off EKS
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
 on:
   repository_dispatch:
     types: [run]
 jobs:
-  chatbot-eks-on:
+  chatbot-eks:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
         environment: ["${{ github.event.client_payload.deploy_env }}"]
+    environment: ${{ matrix.environment }}
     steps:
+      - uses: actions/checkout@v3
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
           repository: devops-sangwon/gh-module
           ref: ${{ secrets.module_version }}
           path: ./action_modules
-      - uses: actions/checkout@v3
       - name: Get AWS Credentials 
         uses: ./action_modules/common/aws/credential
         with:
@@ -24,18 +29,35 @@ jobs:
         uses: ./action_modules/common/deploy/helm
         with:
           EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
-      - name: Helm Rollback history
+      - name: IF
+        id: val
         run: |
-          REVISION=`helm history ${{ github.event.client_payload.helm }} -n ${{ github.event.client_payload.namespace }} | xargs`
+          TYPE=NONE
+          if [[ ${{ github.event.client_payload.type }} == "ON" ]]; then
+            echo "TYPE=ON" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.event.client_payload.type }} == "OFF" ]]; then
+            echo "TYPE=OFF" >> $GITHUB_OUTPUT
+          fi
+      - name: Helm Rollback history
+        if: |
+          steps.val.outputs.TYPE == 'ON'
+        run: |
+          REVISION=`helm history ${{ github.event.client_payload.helm }} -n ${{ github.event.client_payload.namespace }} | wc -l | xargs`
           REVISION=$((REVISION))
           LAST_REVISION=$(($REVISION -1))
           helm rollback ${{ github.event.client_payload.helm }} $LAST_REVISION -n ${{ github.event.client_payload.namespace }}
+      - name: Helm Uninstall
+        if: |
+          steps.val.outputs.TYPE == 'OFF'
+        run: |
+          helm uninstall ${{ github.event.client_payload.helm }} -n ${{ github.event.client_payload.namespace }} --keep-history
 
   slack:
     runs-on: ubuntu-22.04
-    needs: [chatbot-eks-on]
+    needs: [chatbot-eks]
     if: always()
     steps:
+      - uses: actions/checkout@v3
       - name: Clone Module Repository
         uses: actions/checkout@v3
         with:
@@ -44,7 +66,7 @@ jobs:
           path: ./action_modules
       - name: Send to Slack (Success)
         if: |
-          needs.chatbot-eks-on.result == 'success'
+          needs.chatbot-eks.result == 'success'
         uses: ./action_modules/common/slack/success/eks-cost-project/chatbot
         with:
           MESSAGE: 'Success EKS CLUSTER'
@@ -55,7 +77,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.CHATOPS_SLACK_WEBHOOK }}
       - name: Send to Slack(Failure)
         if: |
-          needs.chatbot-eks-on.result == 'failure'
+          needs.chatbot-eks.result == 'failure'
         uses: ./action_modules/common/slack/failure/eks-cost-project/chatbot
         with:
           MESSAGE: 'Failure EKS CLUSTER'
