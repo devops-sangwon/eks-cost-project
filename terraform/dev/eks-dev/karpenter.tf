@@ -42,7 +42,7 @@ resource "kubectl_manifest" "karpenter_provisioner" {
     apiVersion: karpenter.sh/v1alpha5
     kind: Provisioner
     metadata:
-      name: wip
+      name: dev-wip
     spec:
       requirements:
         - key: karpenter.sh/capacity-type
@@ -67,8 +67,10 @@ resource "kubectl_manifest" "karpenter_provisioner" {
         resources:
           cpu: 1k
           memory: 1000Gi
+      labels:
+        Karpenter: enabled
       providerRef:
-        name: wip
+        name: dev-wip
       ttlSecondsAfterEmpty: 30
   YAML
 
@@ -82,7 +84,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
     apiVersion: karpenter.k8s.aws/v1alpha1
     kind: AWSNodeTemplate
     metadata:
-      name: wip
+      name: dev-wip
     spec:
       subnetSelector:
         karpenter.sh/discovery: "true"
@@ -92,6 +94,7 @@ resource "kubectl_manifest" "karpenter_node_template" {
         karpenter.sh/discovery: ${module.eks.cluster_name}
         owner: EleSangwon
         team: devops
+        environment: dev
   YAML
 
   depends_on = [

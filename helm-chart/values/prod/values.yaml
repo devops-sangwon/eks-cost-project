@@ -1,4 +1,0 @@
-
-service:
-  type: ClusterIP33
-  port: 80

@@ -1,0 +1,9 @@
+{{- define "sock-shop.carts-db.hpa" -}}
+metadata:
+  name: carts-db
+spec:
+  scaleTargetRef:
+    name: carts-db
+{{- end -}}
+{{- include "sock-shop.hpa" (list . "sock-shop.carts-db.hpa" ) }}
+

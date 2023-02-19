@@ -1,0 +1,1343 @@
+---
+# Source: sock-shop/templates/carts-db-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: carts-db
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: carts-db
+  type: ClusterIP
+---
+# Source: sock-shop/templates/carts-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: carts
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: carts
+  type: ClusterIP
+---
+# Source: sock-shop/templates/catalogue-db-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: catalogue-db
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: catalogue-db
+  type: ClusterIP
+---
+# Source: sock-shop/templates/catalogue-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: catalogue
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: catalogue
+  type: ClusterIP
+---
+# Source: sock-shop/templates/frontend-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: front-end
+spec:
+  ports:
+  - port: 80
+    targetPort: 8079
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: front-end
+  type: ClusterIP
+---
+# Source: sock-shop/templates/orders-db-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: orders-db
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: orders-db
+  type: ClusterIP
+---
+# Source: sock-shop/templates/orders-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: orders
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: orders
+  type: ClusterIP
+---
+# Source: sock-shop/templates/payment-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: payment
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: payment
+  type: ClusterIP
+---
+# Source: sock-shop/templates/queue-master-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: queue-master
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: queue-master
+  type: ClusterIP
+---
+# Source: sock-shop/templates/rabbitmq-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9090"
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: rabbitmq
+spec:
+  ports:
+  - name: rabbitmq
+    port: 5672
+    targetPort: 5672
+  - name: exporter
+    port: 9090
+    protocol: TCP
+    targetPort: exporter
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: rabbitmq
+  type: ClusterIP
+---
+# Source: sock-shop/templates/session-db-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: session-db
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: session-db
+  type: ClusterIP
+---
+# Source: sock-shop/templates/shipping-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: shipping
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: shipping
+  type: ClusterIP
+---
+# Source: sock-shop/templates/user-db-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: user-db
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: user-db
+  type: ClusterIP
+---
+# Source: sock-shop/templates/user-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: user
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/name: sock-shop
+    name: user
+  type: ClusterIP
+---
+# Source: sock-shop/templates/carts-db-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carts-db
+  labels:
+    name: carts-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: carts-db
+  template:
+    metadata:
+      labels:
+        name: carts-db
+    spec:
+      containers:
+      - name: carts-db
+        image: mongo
+        ports:
+        - name: mongo
+          containerPort: 27017
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/carts-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carts
+  labels:
+    name: carts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: carts
+  template:
+    metadata:
+      labels:
+        name: carts
+    spec:
+      containers:
+      - name: carts
+        image: weaveworksdemos/carts:0.4.8
+        env:
+         - name: JAVA_OPTS
+           value: -Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+        resources:
+          limits:
+            cpu: 300m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/catalogue-db-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue-db
+  labels:
+    name: catalogue-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: catalogue-db
+  template:
+    metadata:
+      labels:
+        name: catalogue-db
+    spec:
+      containers:
+      - name: catalogue-db
+        image: weaveworksdemos/catalogue-db:0.3.0
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: fake_password
+          - name: MYSQL_DATABASE
+            value: socksdb
+        ports:
+        - name: mysql
+          containerPort: 3306
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/catalogue-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+  labels:
+    name: catalogue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: catalogue
+  template:
+    metadata:
+      labels:
+        name: catalogue
+    spec:
+      containers:
+      - name: catalogue
+        image: weaveworksdemos/catalogue:0.3.5
+        command: ["/app"]
+        args:
+        - -port=80
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/frontend-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-end
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: front-end
+  template:
+    metadata:
+      labels:
+        name: front-end
+    spec:
+      containers:
+      - name: front-end
+        image: weaveworksdemos/front-end:0.3.12
+        resources:
+          limits:
+            cpu: 300m
+            memory: 1000Mi
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        ports:
+        - containerPort: 8079
+        env:
+        - name: SESSION_REDIS
+          value: "true"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8079
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8079
+          initialDelaySeconds: 30
+          periodSeconds: 3
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/load-test-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-test
+  labels:
+    name: load-test
+spec:
+  selector:
+    matchLabels:
+      name: load-test
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: load-test
+    spec:
+      containers:
+      - name: load-test
+        image: weaveworksdemos/load-test:0.1.1
+        command: ["locust"]
+        args: ["-c", "100", "-r", "5", "--no-web", "-f", "/config/locustfile.py",
+               "--host", "http://front-end.sock-shop.svc.cluster.local"]
+
+      # initContainers:
+      # - name: wait-sock-shop
+      #   image: alpine:3.6
+      #   # yamllint disable
+      #   command: ['sh', '-c', 'set -x;  apk add --no-cache curl;
+      #     until timeout -t 2 curl -f "${SOCK_SHOP_HEALTH_ADDR}"; do
+      #       echo "waiting for ${SOCK_SHOP_HEALTH_ADDR}";
+      #       sleep 2;
+      #     done;']
+      #   env:
+      #   - name: SOCK_SHOP_HEALTH_ADDR
+      #     value: "http://orders.sock-shop.svc.cluster.local/health"
+
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/orders-db-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-db
+  labels:
+    name: orders-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: orders-db
+  template:
+    metadata:
+      labels:
+        name: orders-db
+    spec:
+      containers:
+      - name: orders-db
+        image: mongo
+        ports:
+        - name: mongo
+          containerPort: 27017
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/orders-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  labels:
+    name: orders
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: orders
+  template:
+    metadata:
+      labels:
+        name: orders
+    spec:
+      containers:
+      - name: orders
+        image: weaveworksdemos/orders:0.4.7
+        env:
+         - name: JAVA_OPTS
+           value: -Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/payment-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  labels:
+    name: payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: payment
+  template:
+    metadata:
+      labels:
+        name: payment
+    spec:
+      containers:
+      - name: payment
+        image: weaveworksdemos/payment:0.4.3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 99m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/queue-master-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-master
+  labels:
+    name: queue-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: queue-master
+  template:
+    metadata:
+      labels:
+        name: queue-master
+    spec:
+      containers:
+      - name: queue-master
+        image: weaveworksdemos/queue-master:0.3.1
+        env:
+         - name: JAVA_OPTS
+           value: -Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+        resources:
+          limits:
+            cpu: 300m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        ports:
+        - containerPort: 80
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/rabbitmq-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: rabbitmq
+  template:
+    metadata:
+      labels:
+        name: rabbitmq
+      annotations:
+        prometheus.io/scrape: "false"
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.6.8-management
+        ports:
+        - containerPort: 15672
+          name: management
+        - containerPort: 5672
+          name: rabbitmq
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+              - DAC_OVERRIDE
+          readOnlyRootFilesystem: true
+      - name: rabbitmq-exporter
+        image: kbudde/rabbitmq-exporter
+        ports:
+        - containerPort: 9090
+          name: exporter
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/session-db-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-db
+  labels:
+    name: session-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: session-db
+  template:
+    metadata:
+      labels:
+        name: session-db
+      annotations:
+        prometheus.io.scrape: "false"
+    spec:
+      containers:
+      - name: session-db
+        image: redis:alpine
+        ports:
+        - name: redis
+          containerPort: 6379
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+          readOnlyRootFilesystem: true
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/shipping-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  labels:
+    name: shipping
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: shipping
+  template:
+    metadata:
+      labels:
+        name: shipping
+    spec:
+      containers:
+      - name: shipping
+        image: weaveworksdemos/shipping:0.4.8
+        env:
+         - name: ZIPKIN
+           value: zipkin.jaeger.svc.cluster.local
+         - name: JAVA_OPTS
+           value: -Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+        resources:
+          limits:
+            cpu: 300m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        ports:
+        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/user-db-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-db
+  labels:
+    name: user-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: user-db
+  template:
+    metadata:
+      labels:
+        name: user-db
+    spec:
+      containers:
+      - name: user-db
+        image: weaveworksdemos/user-db:0.3.0
+
+        ports:
+        - name: mongo
+          containerPort: 27017
+        securityContext:
+          capabilities:
+            drop:
+              - all
+            add:
+              - CHOWN
+              - SETGID
+              - SETUID
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/user-dep.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  labels:
+    name: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: user
+  template:
+    metadata:
+      labels:
+        name: user
+    spec:
+      containers:
+      - name: user
+        image: weaveworksdemos/user:0.4.7
+        resources:
+          limits:
+            cpu: 300m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+        env:
+        - name: mongo
+          value: user-db:27017
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+            add:
+              - NET_BIND_SERVICE
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 180
+          periodSeconds: 3
+      nodeSelector:
+        kubernetes.io/os: linux
+---
+# Source: sock-shop/templates/carts-db-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: carts-db
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: carts-db
+---
+# Source: sock-shop/templates/carts-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: carts
+  namespace: sock-shop
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: carts
+---
+# Source: sock-shop/templates/catalogue-db-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: catalogue-db
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalogue-db
+---
+# Source: sock-shop/templates/catalogue-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: catalogue
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalogue
+---
+# Source: sock-shop/templates/frontend-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: front-end
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: front-end
+---
+# Source: sock-shop/templates/orders-db-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: orders-db
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: orders-db
+---
+# Source: sock-shop/templates/orders-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: orders
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: orders
+---
+# Source: sock-shop/templates/payment-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: payment
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: payment
+---
+# Source: sock-shop/templates/quque-master-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: queue-master
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queue-master
+---
+# Source: sock-shop/templates/rabbitmq-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: rabbitmq
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rabbitmq
+---
+# Source: sock-shop/templates/session-db-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: session-db
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: session-db
+---
+# Source: sock-shop/templates/shipping-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: shipping
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shipping
+---
+# Source: sock-shop/templates/user-db-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: user-db
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-db
+---
+# Source: sock-shop/templates/user-hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sock-shop
+    helm.sh/chart: sock-shop-0.1.0
+  name: user
+spec:
+  maxReplicas: 2
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user
