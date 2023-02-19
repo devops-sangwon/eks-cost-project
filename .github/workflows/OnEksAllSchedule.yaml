@@ -5,7 +5,7 @@ permissions:
   pull-requests: write
 on:
   push:
-    branches: [temp]
+    branches: [temp-on]
   # schedule:
   # - cron: "0 0 * * *"
 
