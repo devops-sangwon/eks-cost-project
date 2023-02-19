@@ -13,11 +13,11 @@ on:
 jobs:
   eks-off:
     strategy:
-      max-parallel: 1
+      # max-parallel: 1
       matrix:
-        environment: ["dev"]
+        # environment: ["dev"]
         namespace: ["sock-shop", "example", "msa"]
-    environment: ${{ matrix.environment }}
+    environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
       - name: Clone Module Repository
