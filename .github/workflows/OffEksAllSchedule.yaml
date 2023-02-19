@@ -16,7 +16,7 @@ jobs:
       # max-parallel: 1
       matrix:
         # environment: ["dev"]
-        namespace: ["sock-shop", "example", "msa"]
+        namespace: ["sock-shop"] #["sock-shop", "example", "msa"]
     environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
     steps:
