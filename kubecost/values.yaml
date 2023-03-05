@@ -605,7 +605,7 @@ kubecostProductConfigs:
 #  # Possible values are: [ development, production, high-availability ]
  clusterProfile: development
 #  customPricesEnabled: false # This makes the default view custom prices-- generally used for on-premises clusters
- spotLabel: Karpenter
+ spotLabel: karpenter
  spotLabelValue: enabled
 #  gpuLabel: gpu
 #  gpuLabelValue: true

@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: cron-keda
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: test-keda
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  advanced:
+    restoreToOriginalReplicaCount: true
+  triggers:
+  - type: cron
+    metadata:
+      timezone: Asia/Seoul
+      start: 59 * * * *
+      end: 7 * * * *
+      desiredReplicas: "5"

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-keda
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: test-keda
+  template:
+    metadata:
+      labels:
+        run: test-keda
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: karpenter.sh/provisioner-name
+                operator: In
+                values:
+                - dev-wip
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: run
+                operator: In
+                values:
+                - test-keda
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - name: test-keda
+        image: registry.k8s.io/hpa-example
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 5000m
+            memory: 3Gi
+          requests:
+            cpu: 2000m
+            memory: 3Gi
