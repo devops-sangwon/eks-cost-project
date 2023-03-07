@@ -17,20 +17,20 @@ jobs:
         working-directory: helm-chart
     steps:
       - uses: actions/checkout@v3
-      - name: Clone Module Repository
-        uses: actions/checkout@v3
-        with:
-          repository: devops-sangwon/gh-module
-          ref: ${{ secrets.module_version }}
-          path: ./action_modules
-      - name: Get AWS Credentials 
-        uses: ./action_modules/common/aws/credential
-        with:
-          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
-      - name: setup kubectl & helm
-        uses: ./action_modules/common/deploy/helm
-        with:
-          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
+      # - name: Clone Module Repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: devops-sangwon/gh-module
+      #     ref: ${{ secrets.module_version }}
+      #     path: ./action_modules
+      # - name: Get AWS Credentials 
+      #   uses: ./action_modules/common/aws/credential
+      #   with:
+      #     AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      # - name: setup kubectl & helm
+      #   uses: ./action_modules/common/deploy/helm
+      #   with:
+      #     EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
       - name: detect helm chart values file
         run: |
           echo "Update working-directory in helm-chart"
