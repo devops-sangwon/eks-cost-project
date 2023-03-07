@@ -37,8 +37,15 @@ jobs:
         id: time
         run: |
           TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
-          echo $TIMESTAMP > $GITHUB_WORKSPACE/template.md
+          echo $TIMESTAMP
+          echo $TIMESTAMP > template.md
+          echo "Cat template.md"
+          cat template.md
+          echo "Move"
+          mv template.md ./$GITHUB_WORKSPACE
           echo $GITHUB_WORKSPACE
+          echo "Cat workspace/template.md"
+          cat $GITHUB_WORKSPACE/template.md
       - uses: mshick/add-pr-comment@v2
         with:
           message-path: $GITHUB_WORKSPACE/template.md
