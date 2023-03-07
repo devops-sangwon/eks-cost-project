@@ -1,0 +1,43 @@
+name: EKS Cost predict
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+on:
+  pull_request:
+    branches: ["dev", "master"]
+    types: [opened, reopened, synchronize]
+
+jobs:
+  eks-cost-predict:
+    environment: dev #${{ matrix.environment }}
+    runs-on: ubuntu-22.04
+    defaults:
+      run: 
+        working-directory: ./helm-chart
+    steps:
+      - name: detect helm chart values file
+        run: |
+          echo "Update working-directory in helm-chart"
+      - uses: actions/checkout@v3
+      - name: Clone Module Repository
+        uses: actions/checkout@v3
+        with:
+          repository: devops-sangwon/gh-module
+          ref: ${{ secrets.module_version }}
+          path: ./action_modules
+      - name: Get AWS Credentials 
+        uses: ./action_modules/common/aws/credential
+        with:
+          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      - name: setup kubectl & helm
+        uses: ./action_modules/common/deploy/helm
+        with:
+          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Hello**
+            🌏
+            !
+      
