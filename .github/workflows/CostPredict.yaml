@@ -1,4 +1,4 @@
-name: EKS Cost predict
+name: EKS Cost predict 2
 permissions:
   id-token: write
   contents: write
@@ -7,37 +7,41 @@ on:
   pull_request:
     branches: ["dev", "master"]
     types: [opened, reopened, synchronize]
+    paths:
+    - 'helm-chart/sock-shop/values/**/values.yaml'
 
 jobs:
   eks-cost-predict:
     environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
-    defaults:
-      run: 
-        working-directory: ./helm-chart
     steps:
+      - uses: actions/checkout@v3
+      # - name: Clone Module Repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: devops-sangwon/gh-module
+      #     ref: ${{ secrets.module_version }}
+      #     path: ./action_modules
+      # - name: Get AWS Credentials 
+      #   uses: ./action_modules/common/aws/credential
+      #   with:
+      #     AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
+      # - name: setup kubectl & helm
+      #   uses: ./action_modules/common/deploy/helm
+      #   with:
+      #     EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
       - name: detect helm chart values file
         run: |
           echo "Update working-directory in helm-chart"
-      - uses: actions/checkout@v3
-      - name: Clone Module Repository
-        uses: actions/checkout@v3
+      - name: timestamp
+        id: time
+        run: |
+          TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
+          echo $TIMESTAMP > $GITHUB_WORKSPACE/template.md
+          echo $GITHUB_WORKSPACE
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          repository: devops-sangwon/gh-module
-          ref: ${{ secrets.module_version }}
-          path: ./action_modules
-      - name: Get AWS Credentials 
-        uses: ./action_modules/common/aws/credential
-        with:
-          AWS_ASSUME_ROLE: ${{ secrets.AWS_ASSUME_ROLE }}
-      - name: setup kubectl & helm
-        uses: ./action_modules/common/deploy/helm
-        with:
-          EKS_CLUSTER: ${{ secrets.EKS_CLUSTER }}
-      - uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            **Hello**
-            🌏
-            !
+          filename: $GITHUB_WORKSPACE/template.md
       
