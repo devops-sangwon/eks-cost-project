@@ -7,14 +7,13 @@ on:
   pull_request:
     branches: ["dev", "master"]
     types: [opened, reopened, synchronize]
+    paths:
+    - 'helm-chart/values/**'
 
 jobs:
   eks-cost-predict:
     environment: dev #${{ matrix.environment }}
     runs-on: ubuntu-22.04
-    defaults:
-      run: 
-        working-directory: helm-chart
     steps:
       - uses: actions/checkout@v3
       # - name: Clone Module Repository
