@@ -1,0 +1,66 @@
+name: EKS Cost predict 2
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+on: 
+  pull_request:
+    branches: ["dev", "master"]
+    types: [opened, reopened, synchronize]
+    paths:
+    - 'helm-chart/sock-shop/values/**/values.yaml'
+
+jobs:
+ # Add file changes job 
+  eks-cost-predict:
+    environment: dev #${{ matrix.environment }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.23.1'
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.7.1'
+      - name: detect helm chart values file
+        run: |
+          echo "Update working-directory in helm-chart"
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1.4.0
+      - name: Print cluster information
+        run: |
+          kubectl config view
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get pods -n kube-system
+          helm version
+          kubectl version
+      - name: install krew
+        run: |
+          (
+            set -x; cd "$(mktemp -d)" &&
+            OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+            ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+            KREW="krew-${OS}_${ARCH}" &&
+            curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+            tar zxvf "${KREW}.tar.gz" &&
+            ./"${KREW}" install krew
+          )
+          export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+          kubectl krew
+          kubectl krew install cost
+          kubectl cost predict -h
+      # - name: kubecost predict
+      #   id: time
+      #   run: |
+      #     helm template helm-chart/sock-shop -f helm-chart/sock-shop/values/dev/values.yaml |  yq e '. | select(.kind == "Deployment")' - > predict-deployment.yaml
+      #     kubectl cost predict -f predict-deployment.yaml
+
+      #     kubectl cost predict -f predict-deployment.yaml > template.md
+      # - uses: harupy/comment-on-pr@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     filename: template.md
+      

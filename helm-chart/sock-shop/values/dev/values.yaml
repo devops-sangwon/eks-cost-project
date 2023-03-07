@@ -1,3 +1,20 @@
-ingress:
-  host: sock-shop-dev.elesangwon.com
-  name: sock-shop-ingress
+
+carts:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      cpu: 300m
+      memory: 500Mi
+
+catalogue:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+
+  
