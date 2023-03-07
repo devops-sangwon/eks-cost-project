@@ -8,7 +8,7 @@ on:
     branches: ["dev", "master"]
     types: [opened, reopened, synchronize]
     paths:
-    - 'helm-chart/*/values/**'
+    - 'helm-chart/sock-shop/values/**'
 
 jobs:
   eks-cost-predict:
