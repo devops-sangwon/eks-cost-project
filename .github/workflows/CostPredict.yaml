@@ -1,4 +1,4 @@
-name: EKS Cost predict 2
+name: EKS Cost predict 3
 permissions:
   id-token: write
   contents: write
@@ -37,11 +37,10 @@ jobs:
         id: time
         run: |
           TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
-          echo $TIMESTAMP > $GITHUB_WORKSPACE/template.md
-          echo $GITHUB_WORKSPACE
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo $TIMESTAMP > template.md
+          pwd
+          ls 
+      - uses: mshick/add-pr-comment@v2
         with:
-          filename: $GITHUB_WORKSPACE/template.md
+          message-path: template.md
       
