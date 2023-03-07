@@ -1,4 +1,4 @@
-name: EKS Cost predict 1
+name: EKS Cost predict 2
 permissions:
   id-token: write
   contents: write
