@@ -39,9 +39,7 @@ jobs:
           TIMESTAMP=`date +%Y-%m-%d_%H-%M-%S`
           echo $TIMESTAMP > $GITHUB_WORKSPACE/template.md
           echo $GITHUB_WORKSPACE
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: mshick/add-pr-comment@v2
         with:
-          filename: $GITHUB_WORKSPACE/template.md
+          message-path: $GITHUB_WORKSPACE/template.md
       
