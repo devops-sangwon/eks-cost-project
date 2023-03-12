@@ -615,10 +615,10 @@ kubecostProductConfigs:
  awsSpotDataBucket: spot-instance-data-feed-elesangwon-dev
  awsSpotDataPrefix: eks-cost-project
  athenaProjectID: "002174788893" # The AWS AccountID where the Athena CUR is. Generally your masterpayer account
- athenaBucketName: aws-athena-query-results-elesangwon-dev
+ athenaBucketName: "s3://aws-athena-query-results-elesangwon-dev"
  athenaRegion: ap-northeast-2
  athenaDatabase: athena_kubecost_cur
- athenaTable: kubecost_cur
-#  athenaWorkgroup: "primary" # The default workgroup in AWS is 'primary'
-#  masterPayerARN: ""
+ athenaTable: "kubecost_cur"
+ athenaWorkgroup: "primary" # The default workgroup in AWS is 'primary'
+ masterPayerARN: arn:aws:iam::002174788893:role/kubecost-dev
  projectID: "002174788893"  # Also known as AccountID on AWS -- the current account/project that this instance of Kubecost is deployed on.

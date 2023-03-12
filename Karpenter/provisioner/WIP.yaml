@@ -7,8 +7,8 @@ spec:
     karpenter: enabled
   limits:
     resources:
-      cpu: 1k
-      memory: 1000Gi
+      cpu: 200
+      memory: 100Gi
   providerRef:
     name: dev-wip
   requirements:
@@ -24,7 +24,7 @@ spec:
     values: ["amd64"]
   - key: karpenter.k8s.aws/instance-category
     operator: In
-    values: ["t3.medium", "t3.large", "t3a.medium", "c"]
+    values: ["t", "c"]
   - key: "karpenter.k8s.aws/instance-cpu"
     operator: In
     values: ["2", "4", "8", "16", "32"]
@@ -32,7 +32,5 @@ spec:
     operator: Gt
     values:
     - "2"
-  # consolidation:
-  #   enabled: true
   ttlSecondsAfterEmpty: 30
-  ttlSecondsUntilExpired: 6000
+  #ttlSecondsUntilExpired: 6000

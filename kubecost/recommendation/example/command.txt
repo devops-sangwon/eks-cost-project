@@ -1,0 +1,38 @@
+KUBECOST_ADDRESS='http://localhost:9090/model'
+
+curl -G \
+  -d 'algorithmRAM=max' \
+  -d 'targetCPUUtilization=0.8' \
+  -d 'targetRAMUtilization=0.8' \
+  -d 'window=1d' \
+  --data-urlencode 'filter=namespace:"sock-shop"' \
+  ${KUBECOST_ADDRESS}/savings/requestSizingV2 > sock-shop.yaml
+
+# latestKnownRequest : define yaml
+
+yq e '.Recommendations[].latestKnownRequest' sock-shop.yaml
+
+# recommendedRequest : Recommendations 
+
+yq e '.Recommendations[].recommendedRequest' sock-shop.yaml
+
+# Namespace 
+
+yq e '.Recommendations[].namespace' sock-shop.yaml
+
+# controllerKind : deployment, sts, ds
+
+yq e '.Recommendations[0].controllerKind' sock-shop.yaml
+
+# currentEfficiency : 
+ 
+yq e '.Recommendations[].currentEfficiency' sock-shop.yaml
+
+
+curl -G \
+  -d 'algorithmRAM=max' \
+  -d 'targetCPUUtilization=0.8' \
+  -d 'targetRAMUtilization=0.8' \
+  -d 'window=10d' \
+  --data-urlencode 'filter=namespace:"sock-shop"' \
+  ${KUBECOST_ADDRESS}/savings/requestSizingV2 > sock-shop-10.yaml

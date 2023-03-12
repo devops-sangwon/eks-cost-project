@@ -54,8 +54,8 @@ module "base_services" {
   output_eks         = local.eks
   profile            = local.profile
   external_dns_zones = ["elesangwon.com"]
-  vault_domain       = "vault-dev.elesangwon.com"
-  kubecost_domain    = "cost-analyzer-dev.elesangwon.com"
+  # vault_domain       = "vault-dev.elesangwon.com"
+  # kubecost_domain    = "cost-analyzer-dev.elesangwon.com"
   external_dns_kubecost_hostname = "cost-analyzer-dev.elesangwon.com"
 
   ## WIP
